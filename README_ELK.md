@@ -1,7 +1,5 @@
 # Getting started with the Elastic Stack and Docker Compose: Part 2
 
-This repository was forked from this project - describe bellow:
-
 ## Elastic Agent, Fleet, and Elastic APM
 
 This repo is in reference to the blog [Getting Started with the Elastic Stack and Docker Compose: Part 2](https://www.elastic.co/blog/getting-started-with-the-elastic-stack-and-docker-compose-part-2)
