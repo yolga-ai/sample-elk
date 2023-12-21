@@ -9,11 +9,32 @@ a playground for the ELK stack.
 - Python 3.11
 - Setup environment
 
+To run script for generating random data, you need to setup the environment:
 ```shell
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r ./playground/requirements.txt
+``` 
+
+### Run environment
+
+Run ELK stack:
+```shell
+docker-compose up -d
 ```
+
+and then run the script for generating the data:
+```shell
+python ./playground/gen_data.py 
+```
+it will generate 20000 random records and send them to the elastic.
+You can change parameters in the script:
+
+- docs_number - number of documents to generate
+- index_name - name of the index to send data to
+- max_seconds - max number of seconds to generate data
+
+Script stops when one of the conditions is met (docs_number or max_seconds)
 
 ## Usage
 
