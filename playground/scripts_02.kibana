@@ -1,0 +1,184 @@
+############################################################
+# Workshop #2
+############################################################
+
+# Today:
+# 1. Cluster, nodes, allocation APIs
+# 2. Tasks
+# 3. Indices CAT APIs
+# 4. Shards
+# 5. Segments
+# 6. Defragmentation
+
+# CAT - Compact and aligned text APIs
+
+
+############################################################
+# CLUSTER, NODES, ALLOCATION
+############################################################
+
+GET /
+
+GET /_cluster/health
+
+GET /_cluster/settings
+
+GET /_cluster/settings?include_defaults
+
+PUT _cluster/settings
+{
+  "persistent": {
+    "cluster.routing.allocation.enable": "all"
+  }
+}
+
+GET /_cluster/stats
+
+# more cluster APIs: 
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html
+
+GET _cat/health?v&h=cluster,status,shards
+
+GET _cat/health?v&h=cluster,status,shards&format=json
+
+GET _cat/health?v
+
+GET _cat/health?help  
+
+GET /_cat/master?v 
+
+GET /_nodes
+
+GET _cat/nodes?v
+
+GET _cat/nodes?v&s=name&h=name,master,node.role,heap.percent,disk.used_percent,cpu
+
+GET /_cat/nodeattrs?v
+
+GET _cat/plugins?v
+
+GET _cat/allocation?v
+# > 85% - write.block.index = true,  30%, fault talerance - 1 node failed, 2 nodes
+# 5tb * 6 nodes = 30 TB, 70% = 21TB data (primary, replica) 3.5tb data
+# 1 node fails - 25TB, 21TB > resharding > 16% disk left >indices readonly... 
+# ... for 60% > 20% ... 
+# 2 node fails - .... ?
+
+
+GET /_cat/allocation?v&s=node&h=node,shards,disk.percent,disk.indices,disk.used,disk.avail,disk.total,disk.percent,nodeRole
+
+GET /_cat/allocation?v&s=node
+
+
+############################################################
+# TASKS
+############################################################
+
+GET _cat/tasks?v&format=json
+
+GET /_tasks
+
+GET /_tasks?group_by=parents&detailed&human
+
+GET /_tasks/8YLLUdR9TZmcJo580xKueg:109?human
+
+POST /_tasks/8YLLUdR9TZmcJo580xKueg:109/_cancel
+
+GET /_tasks?detailed&group_by=parents&human&actions=*merge*
+
+GET /_cat/pending_tasks
+
+GET /_cat/thread_pool?v&s=queue:desc,active:desc
+
+
+
+############################################################
+# INDICES APIs
+############################################################
+
+GET _cat/indices?v
+
+GET _cat/indices/texts?v
+
+GET _cat/indices?help
+
+GET _cat/indices?v&h=index,merges.current,merges.total,indexing.index_time,docs.count,creation.date.string,store.size,pri.store.size
+
+GET _cat/indices/split-texts-000001           
+
+GET _cat/indices/texts
+
+GET /_cat/indices/texts/?s=index&v
+
+
+GET /_cat/indices/?v&h=index,docs.count,store.size,pri.store.size&s=index&include_unloaded_segments
+
+GET /_cat/indices?health=green
+
+GET /_cat/indices?health=yellow
+
+GET /_cat/indices/texts?v&h=index,docs.count,store.size,pri.store.size&s=index
+
+
+############################################################
+# SHARDS
+############################################################
+
+
+GET /_cat/shards?v&s=state,node,store&h=index,shard,prirep,state,docs,store,node
+
+GET /_cat/shards/texts?v&s=state,node,store&h=index,shard,prirep,state,docs,store,node
+
+GET /_search_shards
+
+GET /_search_shards?index=texts
+
+PUT texts/_settings
+{
+  "number_of_replicas": 1
+}
+
+GET /_cat/thread_pool?v&s=queue:desc,active:desc
+
+GET /_cat/indices?health=green
+
+GET /_cat/indices?health=yellow
+
+POST /_cluster/reroute?retry_failed=true
+
+GET /_cat/recovery?v
+
+GET /_cat/recovery?active_only
+
+
+GET /_cluster/allocation/explain
+{
+  "index": "split-texts-000001",
+  "shard": 0,
+  "primary": false
+}
+
+
+############################################################
+# SEGMENTS
+############################################################
+
+GET /_segments
+
+GET /_segments?filter_path=indices.*.shards.*.num_committed_segments
+
+GET texts/_segments?filter_path=indices.*.shards.*.num_committed_segments
+
+
+############################################################
+# SEGMENTS DEFRAGMENTATION
+############################################################
+
+POST /split-texts-000001/_forcemerge?only_expunge_deletes=true&wait_for_completion=false
+
+GET _tasks/VHuLhBpPQ2ubUUmoIV79Ag:253921
+
+GET _cat/indices/texts?v
+
+GET texts/_segments?filter_path=indices.*.shards.*.num_committed_segments
+
